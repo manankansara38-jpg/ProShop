@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "node backend/server.js",
     "start":"node backend/server.js",
-    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend "
+    "build": "npm install && npm install --prefix frontend --legacy-peer-deps && npm run build --prefix frontend"
   },
   "author": "Manan Kansara",
   "license": "ISC",
