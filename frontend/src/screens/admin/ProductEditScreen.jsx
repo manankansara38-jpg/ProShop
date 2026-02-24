@@ -85,11 +85,15 @@ const ProductEditScreen = () => {
   const uploadFileHandler = async (e) => {
     const formData = new FormData();
     formData.append('image', e.target.files[0]);
+    console.log('Starting upload with file:', e.target.files[0]);
     try {
       const res = await uploadProductImage(formData).unwrap();
+      console.log('Upload response:', res);
       toast.success(res.message);
       setImage(res.image);
+      console.log('Image URL set to:', res.image);
     } catch (err) {
+      console.error('Upload error:', err);
       toast.error(err?.data?.message || err.error);
     }
   };

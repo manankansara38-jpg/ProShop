@@ -65,6 +65,9 @@ router.post('/', (req, res) => {
 
       const result = await streamUpload(req);
 
+      console.log('Cloudinary upload result:', result);
+      console.log('Secure URL:', result.secure_url);
+
       res.status(200).send({
         message: 'Image uploaded successfully',
         image: result.secure_url,
