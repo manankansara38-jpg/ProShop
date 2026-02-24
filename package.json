@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "node backend/server.js",
     "start":"node backend/server.js",
-    "build": "npm install && npm install --prefix frontend --legacy-peer-deps && npm run build --prefix frontend"
+    "build": "npm install && npm install --prefix frontend --legacy-peer-deps && npm run build --prefix frontend",
+    "migrate-images": "node backend/scripts/updateImagesToCloudinary.js"
   },
   "author": "Manan Kansara",
   "license": "ISC",
