@@ -35,15 +35,29 @@ const upload = multer({ storage, fileFilter });
 const uploadSingleImage = upload.single('image');
 
 router.post('/', (req, res) => {
+  console.log('Upload route called');
+  console.log('Cloudinary config:', {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    has_api_key: !!process.env.CLOUDINARY_API_KEY,
+    has_api_secret: !!process.env.CLOUDINARY_API_SECRET,
+  });
+  
   uploadSingleImage(req, res, async function (err) {
     if (err) {
-      console.error('Upload error:', err);
+      console.error('Multer error:', err);
       return res.status(400).send({ message: err.message || 'Image upload failed' });
     }
 
     if (!req.file) {
+      console.error('No file provided');
       return res.status(400).send({ message: 'No file provided' });
     }
+
+    console.log('File received:', {
+      filename: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+    });
 
     try {
       // Upload to Cloudinary
@@ -55,8 +69,13 @@ router.post('/', (req, res) => {
               folder: 'proshop',
             },
             (error, result) => {
-              if (error) reject(error);
-              else resolve(result);
+              if (error) {
+                console.error('Cloudinary error:', error);
+                reject(error);
+              } else {
+                console.log('Cloudinary upload successful:', result.secure_url);
+                resolve(result);
+              }
             }
           );
           stream.end(req.file.buffer);
@@ -74,7 +93,7 @@ router.post('/', (req, res) => {
       });
     } catch (error) {
       console.error('Cloudinary upload error:', error);
-      res.status(500).send({ message: 'Failed to upload image to cloud storage' });
+      res.status(500).send({ message: `Failed to upload image: ${error.message}` });
     }
   });
 });

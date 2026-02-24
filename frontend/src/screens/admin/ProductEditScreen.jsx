@@ -83,18 +83,29 @@ const ProductEditScreen = () => {
   }, [product]);
 
   const uploadFileHandler = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
+    
     const formData = new FormData();
-    formData.append('image', e.target.files[0]);
-    console.log('Starting upload with file:', e.target.files[0]);
+    formData.append('image', file);
+    console.log('Starting upload with file:', file.name, file.size, file.type);
     try {
+      console.log('Calling uploadProductImage API...');
       const res = await uploadProductImage(formData).unwrap();
       console.log('Upload response:', res);
       toast.success(res.message);
       setImage(res.image);
       console.log('Image URL set to:', res.image);
     } catch (err) {
-      console.error('Upload error:', err);
-      toast.error(err?.data?.message || err.error);
+      console.error('Upload error full object:', err);
+      console.error('Error status:', err?.status);
+      console.error('Error data:', err?.data);
+      const errorMessage = err?.data?.message || err?.message || 'Upload failed';
+      console.error('Final error message:', errorMessage);
+      toast.error(errorMessage);
     }
   };
 
