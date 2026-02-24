@@ -8,29 +8,28 @@ const ProductCarousel = () => {
       title: 'Electronics & Gadgets',
       subtitle: 'Latest Technology',
       category: 'Electronics',
-      image: '/uploads/image-1771674272715.png',
+      image: 'https://res.cloudinary.com/dgbhtbe9o/image/upload/v1771960671/proshop-banners/yhieeutyh3ltnyvbubol.png',
     },
     {
       id: 2,
       title: 'Fashion & Clothing',
       subtitle: 'Trendy Collection',
       category: 'Clothes',
-      image: '/uploads/image-1771674410097.png',
+      image: 'https://res.cloudinary.com/dgbhtbe9o/image/upload/v1771960672/proshop-banners/slbgwgkseq2kedcidcfd.png',
     },
     {
       id: 3,
       title: 'Fresh Vegetables',
       subtitle: 'Organic & Healthy',
       category: 'Vegetables',
-    
-      image: '/uploads/image-1771586088878.png',
+      image: 'https://res.cloudinary.com/dgbhtbe9o/image/upload/v1771960673/proshop-banners/wulpuc83v7jwlzhr86hb.png',
     },
     {
       id: 4,
       title: 'Medicine & Healthcare',
       subtitle: 'Your Health Matters',
       category: 'Medicine',
-      image: '/uploads/image-1771586172674.png',
+      image: 'https://res.cloudinary.com/dgbhtbe9o/image/upload/v1771960675/proshop-banners/bbtxp5tgfbeftuelij4p.png',
     }
   ];
 
