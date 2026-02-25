@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import sgMailModule from '@sendgrid/mail';
 
 const sendEmail = async ({ to, subject, html }) => {
   console.log('\n📧 ================================');
@@ -12,10 +11,15 @@ const sendEmail = async ({ to, subject, html }) => {
   if (process.env.SENDGRID_API_KEY) {
     try {
       console.log('📧 Attempting SendGrid Web API...');
-      sgMailModule.setApiKey(process.env.SENDGRID_API_KEY);
+      // Dynamic import to prevent load errors if package is missing
+      const sgMailModule = await import('@sendgrid/mail');
+      const sgMail = sgMailModule.default;
       
-      // SendGrid requires from.email to be a valid email address
-      const fromEmail = process.env.SMTP_USER;
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      
+      // SendGrid Web API requires from.email to be a valid email address
+      // Use SENDGRID_FROM_EMAIL if set, otherwise fall back to noreplyshoppers173@gmail.com
+      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreplyshoppers173@gmail.com';
       const fromName = process.env.SMTP_FROM || 'ProShop';
       console.log('📧 From Email:', fromEmail);
       console.log('📧 From Name:', fromName);
@@ -31,7 +35,7 @@ const sendEmail = async ({ to, subject, html }) => {
       };
 
       console.log('📧 Sending via SendGrid Web API...');
-      const result = await sgMailModule.send(msg);
+      const result = await sgMail.send(msg);
       console.log('✅ EMAIL SENT SUCCESSFULLY via SendGrid Web API');
       console.log('  Response:', result[0] && result[0].statusCode);
       console.log('📧 ================================\n');
