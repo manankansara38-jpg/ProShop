@@ -7,53 +7,44 @@ const sendEmail = async ({ to, subject, html }) => {
   console.log('📧 To:', to);
   console.log('📧 Subject:', subject);
   console.log('📧 DEBUG: NODE_ENV=', process.env.NODE_ENV || 'not set');
-  console.log('📧 DEBUG: SENDGRID_API_KEY present?', !!process.env.SENDGRID_API_KEY);
-  // Do not print full API key; show prefix to help detect truncation
-  console.log('📧 DEBUG: SENDGRID_API_KEY prefix:', process.env.SENDGRID_API_KEY ? process.env.SENDGRID_API_KEY.slice(0, 8) : 'NOT SET');
-  console.log('📧 DEBUG: SENDGRID_FROM_EMAIL=', process.env.SENDGRID_FROM_EMAIL || 'NOT SET');
+  console.log('📧 DEBUG: MAILGUN_API_KEY present?', !!process.env.MAILGUN_API_KEY);
+  console.log('📧 DEBUG: MAILGUN_DOMAIN=', process.env.MAILGUN_DOMAIN || 'NOT SET');
 
-  // PRIORITY 1: If SendGrid API key is provided, use the Web API (works around blocked SMTP)
-  if (process.env.SENDGRID_API_KEY) {
+  // PRIORITY 1: If Mailgun credentials are provided, use Mailgun Web API
+  if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
     try {
-      console.log('📧 Attempting SendGrid Web API...');
+      console.log('📧 Attempting Mailgun Web API...');
       // Dynamic import to prevent load errors if package is missing
-      const sgMailModule = await import('@sendgrid/mail');
-      const sgMail = sgMailModule.default;
+      const FormData = (await import('form-data')).default;
+      const MailgunClient = (await import('mailgun.js')).default;
+      const mailgun = new MailgunClient(FormData);
+      const client = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY });
+      const mg = client.domains.domain(process.env.MAILGUN_DOMAIN);
       
-      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      const fromName = process.env.MAILGUN_FROM_NAME || 'ProShop';
+      const fromEmail = process.env.MAILGUN_FROM_EMAIL || `noreply@${process.env.MAILGUN_DOMAIN}`;
       
-      // SendGrid Web API requires from.email to be a valid email address
-      // Use SENDGRID_FROM_EMAIL if set, otherwise fall back to noreplyshoppers173@gmail.com
-      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreplyshoppers173@gmail.com';
-      const fromName = process.env.SMTP_FROM || 'ProShop';
       console.log('📧 From Email:', fromEmail);
       console.log('📧 From Name:', fromName);
-      
-      const msg = {
+
+      const messageData = {
         to,
-        from: {
-          email: fromEmail,
-          name: fromName,
-        },
+        from: `${fromName} <${fromEmail}>`,
         subject,
         html,
       };
 
-      console.log('📧 Sending via SendGrid Web API...');
-      const result = await sgMail.send(msg);
-      console.log('✅ EMAIL SENT SUCCESSFULLY via SendGrid Web API');
-      console.log('  Response:', result[0] && result[0].statusCode);
+      console.log('📧 Sending via Mailgun Web API...');
+      const result = await mg.messages.create(messageData);
+      console.log('✅ EMAIL SENT SUCCESSFULLY via Mailgun');
+      console.log('  Message ID:', result.id);
       console.log('📧 ================================\n');
-      return { sent: true, via: 'sendgrid' };
-    } catch (sgErr) {
+      return { sent: true, via: 'mailgun', messageId: result.id };
+    } catch (mgErr) {
       console.error('\n❌ ================================');
-      console.error('❌ SENDGRID WEB API FAILED');
+      console.error('❌ MAILGUN WEB API FAILED');
       console.error('❌ ================================');
-      console.error('❌ Error:', sgErr && sgErr.message ? sgErr.message : sgErr);
-      if (sgErr.response) {
-        console.error('❌ Status:', sgErr.response.statusCode);
-        console.error('❌ Body:', sgErr.response.body);
-      }
+      console.error('❌ Error:', mgErr && mgErr.message ? mgErr.message : String(mgErr));
       console.error('❌ Will try SMTP fallback...');
     }
   }
@@ -116,7 +107,7 @@ const sendEmail = async ({ to, subject, html }) => {
     return { sent: true, via: 'smtp', messageId: info && info.messageId };
   } catch (error) {
     console.error('\n❌ ================================');
-    console.error('❌ EMAIL SEND FAILED (BOTH SendGrid + SMTP)');
+    console.error('❌ EMAIL SEND FAILED (BOTH Mailgun + SMTP)');
     console.error('❌ ================================');
     console.error('❌ Error:', error.message || error);
     console.error('❌ Code:', error.code);
