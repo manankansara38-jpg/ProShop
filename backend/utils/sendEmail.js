@@ -20,11 +20,25 @@ const sendEmail = async ({ to, subject, html }) => {
       startTime = Date.now();
       
       // Dynamic import to prevent load errors if package is missing
+      console.log('📧 Importing form-data...');
       const FormData = (await import('form-data')).default;
+      console.log('📧 ✓ form-data imported');
+      
+      console.log('📧 Importing mailgun.js...');
       const MailgunClient = (await import('mailgun.js')).default;
+      console.log('📧 ✓ mailgun.js imported');
+      
+      console.log('📧 Initializing Mailgun client with API key length:', process.env.MAILGUN_API_KEY.length);
       const mailgun = new MailgunClient(FormData);
+      console.log('📧 ✓ Mailgun instance created');
+      
+      console.log('📧 Creating client with username=api...');
       const client = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY });
+      console.log('📧 ✓ Client created');
+      
+      console.log('📧 Getting domain:', process.env.MAILGUN_DOMAIN);
       const mg = client.domains.domain(process.env.MAILGUN_DOMAIN);
+      console.log('📧 ✓ Domain reference obtained');
       
       const fromName = process.env.MAILGUN_FROM_NAME || 'ProShop';
       const fromEmail = process.env.MAILGUN_FROM_EMAIL || `noreply@${process.env.MAILGUN_DOMAIN}`;
@@ -40,10 +54,16 @@ const sendEmail = async ({ to, subject, html }) => {
       };
 
       console.log('📧 Sending via Mailgun Web API (5s timeout)...');
+      console.log('📧 Message object:', { to, subject: subject.substring(0, 50), from: `${fromName} <${fromEmail}>` });
+      
+      const mailgunSendStart = Date.now();
+      console.log('📧 Calling mg.messages.create()...');
       const result = await Promise.race([
         mg.messages.create(messageData),
         new Promise((_, reject) => setTimeout(() => reject(new Error('Mailgun API timeout (5s)')), 5000))
       ]);
+      const mailgunTime = Date.now() - mailgunSendStart;
+      console.log('📧 ✓ Mailgun returned in', mailgunTime, 'ms');
       const elapsed = Date.now() - startTime;
       console.log('✅ EMAIL SENT SUCCESSFULLY via Mailgun');
       console.log('  Message ID:', result.id);
@@ -55,9 +75,12 @@ const sendEmail = async ({ to, subject, html }) => {
       console.error('\n❌ ================================');
       console.error('❌ MAILGUN WEB API FAILED');
       console.error('❌ ================================');
-      console.error('❌ Error:', mgErr && mgErr.message ? mgErr.message : String(mgErr));
+      console.error('❌ Error type:', mgErr?.constructor?.name);
+      console.error('❌ Error message:', mgErr && mgErr.message ? mgErr.message : String(mgErr));
       console.error('❌ Error code:', mgErr?.code || 'unknown');
-      console.error('❌ Time before failure:', elapsed, 'ms');
+      console.error('❌ Error status:', mgErr?.status || 'unknown');
+      console.error('❌ Time elapsed before failure:', elapsed, 'ms');
+      console.error('❌ Full error object:', JSON.stringify(mgErr, null, 2));
       console.error('❌ Will try SMTP fallback...');
       console.error('❌ ================================\n');
     }
@@ -135,12 +158,17 @@ const sendEmail = async ({ to, subject, html }) => {
     console.error('\n❌ ================================');
     console.error('❌ EMAIL SEND FAILED (BOTH Mailgun + SMTP)');
     console.error('❌ ================================');
-    console.error('❌ Error:', error.message || error);
+    console.error('❌ Error type:', error?.constructor?.name);
+    console.error('❌ Error message:', error.message || error);
     console.error('❌ Error code:', error.code || 'N/A');
     console.error('❌ Error errno:', error.errno || 'N/A');
+    console.error('❌ Error address:', error.address || 'N/A');
+    console.error('❌ Error port:', error.port || 'N/A');
     console.error('❌ To:', to);
     console.error('❌ Subject:', subject);
-    console.error('❌ StackTrace:', error.stack);
+    console.error('❌ SMTP Host:', process.env.SMTP_HOST);
+    console.error('❌ SMTP Port:', process.env.SMTP_PORT || 587);
+    console.error('❌ Stack:', error.stack);
     console.error('❌ ================================\n');
     return { error: error.message || error, sent: false };
   }
