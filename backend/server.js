@@ -26,11 +26,15 @@ app.use((req, res, next) => {
   // Allow requests from any origin (adjust for production if needed)
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-rtb-fingerprint-id');
   res.header('Access-Control-Allow-Credentials', 'true');
   
-  // Permissions Policy - allow accelerometer and other features
-  res.header('Permissions-Policy', 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()');
+  // Permissions Policy - disallow unnecessary features
+  // Using modern Permissions-Policy syntax
+  res.header('Permissions-Policy', 'accelerometer=(), camera=(), microphone=(), geolocation=(), gyroscope=(), magnetometer=(), payment=(self "https://checkout.razorpay.com"), usb=()');
+  
+  // Expose headers that third parties might need
+  res.header('Access-Control-Expose-Headers', 'Content-Type, x-rtb-fingerprint-id');
   
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
