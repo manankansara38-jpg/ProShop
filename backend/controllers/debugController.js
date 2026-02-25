@@ -58,3 +58,32 @@ const checkSendGrid = asyncHandler(async (req, res) => {
 });
 
 export { checkSendGrid };
+
+// POST /api/debug/send-email
+// Protected by header 'x-debug-key' matching env DEBUG_TRIGGER_KEY
+const sendTestEmail = asyncHandler(async (req, res) => {
+  const secret = process.env.DEBUG_TRIGGER_KEY;
+  const header = req.headers['x-debug-key'];
+
+  if (!secret) {
+    return res.status(403).json({ error: 'Debug trigger not configured on server' });
+  }
+
+  if (!header || header !== secret) {
+    return res.status(403).json({ error: 'Invalid debug key' });
+  }
+
+  const to = req.body && req.body.to ? req.body.to : null;
+  if (!to) return res.status(400).json({ error: 'Missing "to" in JSON body' });
+
+  // Lazy import to avoid unnecessary module loads
+  const sendEmail = (await import('../utils/sendEmail.js')).default;
+
+  const subject = 'ProShop - Test Email';
+  const html = `<p>This is a test email from your ProShop deployment to <strong>${to}</strong>.</p>`;
+
+  const result = await sendEmail({ to, subject, html });
+  return res.json({ result });
+});
+
+export { checkSendGrid, sendTestEmail };
