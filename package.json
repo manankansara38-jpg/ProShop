@@ -8,7 +8,11 @@
     "dev": "node backend/server.js",
     "start":"node backend/server.js",
     "build": "npm install && npm install --prefix frontend --legacy-peer-deps && npm run build --prefix frontend",
-    "migrate-images": "node backend/scripts/updateImagesToCloudinary.js"
+    "migrate-images": "node backend/scripts/updateImagesToCloudinary.js",
+    "verify-images": "node backend/scripts/verifyProductImages.js",
+    "fix-product-images": "node backend/scripts/fixProductImages.js",
+    "fix-order-images": "node backend/scripts/fixOrderImages.js",
+    "test-email": "node backend/scripts/testEmail.js"
   },
   "author": "Manan Kansara",
   "license": "ISC",
