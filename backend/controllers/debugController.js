@@ -57,8 +57,6 @@ const checkSendGrid = asyncHandler(async (req, res) => {
   }
 });
 
-export { checkSendGrid };
-
 // POST /api/debug/send-email
 // Protected by header 'x-debug-key' matching env DEBUG_TRIGGER_KEY
 const sendTestEmail = asyncHandler(async (req, res) => {
