@@ -14,12 +14,18 @@ const sendEmail = async ({ to, subject, html }) => {
       console.log('📧 Attempting SendGrid Web API...');
       sgMailModule.setApiKey(process.env.SENDGRID_API_KEY);
       
-      const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER;
-      console.log('📧 From:', fromEmail);
+      // SendGrid requires from.email to be a valid email address
+      const fromEmail = process.env.SMTP_USER;
+      const fromName = process.env.SMTP_FROM || 'ProShop';
+      console.log('📧 From Email:', fromEmail);
+      console.log('📧 From Name:', fromName);
       
       const msg = {
         to,
-        from: fromEmail,
+        from: {
+          email: fromEmail,
+          name: fromName,
+        },
         subject,
         html,
       };
@@ -27,7 +33,7 @@ const sendEmail = async ({ to, subject, html }) => {
       console.log('📧 Sending via SendGrid Web API...');
       const result = await sgMailModule.send(msg);
       console.log('✅ EMAIL SENT SUCCESSFULLY via SendGrid Web API');
-      console.log('  Response:', result[0].statusCode);
+      console.log('  Response:', result[0] && result[0].statusCode);
       console.log('📧 ================================\n');
       return { sent: true, via: 'sendgrid' };
     } catch (sgErr) {
