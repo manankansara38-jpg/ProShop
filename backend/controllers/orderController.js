@@ -225,45 +225,52 @@ const getOrderById = asyncHandler(async (req, res) => {
 // @route   PUT /api/orders/:id/pay
 // @access  Private
 const updateOrderToPaid = asyncHandler(async (req, res) => {
-  try {
-    console.log('💳 RAZORPAY PAYMENT UPDATE REQUEST:');
-    console.log('  Order ID:', req.params.id);
-    console.log('  Razorpay details:', {
-      razorpayPaymentId: req.body.razorpayPaymentId,
-      razorpayOrderId: req.body.razorpayOrderId,
-    });
+  console.log('💳 RAZORPAY PAYMENT UPDATE REQUEST:');
+  console.log('  Order ID:', req.params.id);
+  console.log('  Razorpay details:', {
+    razorpayPaymentId: req.body.razorpayPaymentId,
+    razorpayOrderId: req.body.razorpayOrderId,
+  });
 
-    // Validate that Razorpay payment ID is provided
-    if (!req.body.razorpayPaymentId) {
-      throw new Error('Razorpay Payment ID is missing');
-    }
+  // Validate that Razorpay payment ID is provided
+  if (!req.body.razorpayPaymentId) {
+    res.status(400);
+    throw new Error('Razorpay Payment ID is missing');
+  }
 
-    const order = await Order.findById(req.params.id);
+  const order = await Order.findById(req.params.id);
 
-    if (!order) {
-      res.status(404);
-      throw new Error('Order not found');
-    }
+  if (!order) {
+    res.status(404);
+    throw new Error('Order not found');
+  }
 
-    // Check if order was already paid
-    if (order.isPaid) {
-      res.status(400);
-      throw new Error('Order already paid');
-    }
+  // Check if order was already paid
+  if (order.isPaid) {
+    res.status(400);
+    throw new Error('Order already paid');
+  }
 
-    // Mark order as paid
-    order.isPaid = true;
-    order.paidAt = Date.now();
-    order.paymentResult = {
-      id: req.body.razorpayPaymentId,
-      status: 'COMPLETED',
-      update_time: new Date().toISOString(),
-      email_address: order.user?.email || 'customer@proshop.com',
-    };
+  // Mark order as paid
+  order.isPaid = true;
+  order.paidAt = Date.now();
+  order.paymentResult = {
+    id: req.body.razorpayPaymentId,
+    status: 'COMPLETED',
+    update_time: new Date().toISOString(),
+    email_address: order.user?.email || 'customer@proshop.com',
+  };
 
-    const updatedOrder = await order.save();
-    console.log('✅ Order marked as paid:', updatedOrder._id);
+  const updatedOrder = await order.save();
+  console.log('✅ Order marked as paid:', updatedOrder._id);
 
+  // IMPORTANT: Send response immediately to prevent timeout
+  res.json(updatedOrder);
+
+  // Process post-payment actions asynchronously (non-blocking)
+  // These will run in the background without blocking the API response
+  setImmediate(async () => {
+    try {
       // Send order confirmation email with bill summary
       try {
         const user = await User.findById(updatedOrder.user);
@@ -333,16 +340,29 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
             <p style="margin-top: 30px;">We will notify you once your order ships. Thank you for shopping with us!</p>
           `;
 
-          await sendEmail({
+          // Use a timeout wrapper to ensure email doesn't hang
+          const emailPromise = sendEmail({
             to: user.email,
             subject: `Order Confirmation - Order #${updatedOrder._id}`,
             html: billHtml,
           });
-          console.log('Order confirmation email sent to:', user.email);
+
+          // Add timeout to prevent hanging
+          Promise.race([
+            emailPromise,
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Email send timeout')), 10000)
+            ),
+          ])
+            .then(() => {
+              console.log('✅ Order confirmation email sent to:', user.email);
+            })
+            .catch((err) => {
+              console.error('❌ Error sending order confirmation email:', err.message);
+            });
         }
       } catch (emailErr) {
-        console.error('Error sending order confirmation email:', emailErr);
-        // Do not fail the order payment if email fails
+        console.error('❌ Error processing order confirmation email:', emailErr.message);
       }
 
       // Increment coupon usage if coupon was applied
@@ -355,16 +375,16 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
               $addToSet: { usedBy: updatedOrder.user }
             }
           );
-          console.log('Coupon usage count updated and user added to usedBy:', updatedOrder.couponCode);
+          console.log('✅ Coupon usage count updated:', updatedOrder.couponCode);
         } catch (couponErr) {
-          console.error('Error updating coupon usage:', couponErr);
+          console.error('❌ Error updating coupon usage:', couponErr.message);
         }
       }
 
       // Send thank you coupon for next order
       try {
         const user = await User.findById(updatedOrder.user);
-        if (user) {
+        if (user && user.email) {
           // Create thank you coupon unique for this purchase
           const randomCode = crypto.randomBytes(4).toString('hex').toUpperCase();
           const thankYouCoupon = await Coupon.create({
@@ -373,8 +393,8 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
             couponType: 'thankyou',
             isActive: true,
             description: 'Thank you coupon for your purchase',
-            maxUsage: 1, // Single use only
-            assignedTo: [user._id], // Assign only to this user
+            maxUsage: 1,
+            assignedTo: [user._id],
           });
 
           const thankYouHtml = `
@@ -392,23 +412,33 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
             <p>Best regards,<br>The ProShop Team</p>
           `;
 
-          await sendEmail({
+          // Use a timeout wrapper for thank you email too
+          const emailPromise = sendEmail({
             to: user.email,
             subject: 'Thank You for Your Order! Here\'s Your Next Purchase Discount 🎁',
             html: thankYouHtml,
           });
-          console.log('Thank you coupon email sent to:', user.email);
+
+          Promise.race([
+            emailPromise,
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Email send timeout')), 10000)
+            ),
+          ])
+            .then(() => {
+              console.log('✅ Thank you coupon email sent to:', user.email);
+            })
+            .catch((err) => {
+              console.error('❌ Error sending thank you email:', err.message);
+            });
         }
       } catch (thankYouErr) {
-        console.error('Error sending thank you coupon:', thankYouErr);
-        // Don't fail payment if thank you coupon fails
+        console.error('❌ Error creating/sending thank you coupon:', thankYouErr.message);
       }
-
-      res.json(updatedOrder);
-  } catch (err) {
-    console.error('Payment update error:', err.message);
-    throw err;
-  }
+    } catch (backgroundErr) {
+      console.error('❌ Background task error:', backgroundErr.message);
+    }
+  });
 });
 
 // @desc    Update order to delivered
