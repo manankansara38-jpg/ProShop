@@ -1,4 +1,5 @@
 import asyncHandler from '../middleware/asyncHandler.js';
+import https from 'https';
 
 // GET /api/debug/sendgrid
 // Returns whether SENDGRID_API_KEY and SENDGRID_FROM_EMAIL are present
@@ -18,26 +19,36 @@ const checkSendGrid = asyncHandler(async (req, res) => {
     return res.json({ ...result, message: 'SENDGRID_API_KEY not set on server' });
   }
 
-  // Try an HTTP request to SendGrid to validate network + key
+  // Use native https to avoid relying on global fetch
   try {
-    const resp = await fetch('https://api.sendgrid.com/v3/user/account', {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY}` },
-      // keep short timeout by relying on platform request timeout
+    const sgResp = await new Promise((resolve, reject) => {
+      const options = {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY}` },
+      };
+
+      const req = https.request('https://api.sendgrid.com/v3/user/account', options, (r) => {
+        let data = '';
+        r.on('data', (chunk) => (data += chunk));
+        r.on('end', () => resolve({ statusCode: r.statusCode, body: data }));
+      });
+
+      req.on('error', (e) => reject(e));
+      req.setTimeout(5000, () => {
+        req.destroy(new Error('request timeout'));
+      });
+      req.end();
     });
 
-    const text = await resp.text();
     let body;
     try {
-      body = JSON.parse(text);
+      body = JSON.parse(sgResp.body);
     } catch (e) {
-      body = text;
+      body = typeof sgResp.body === 'string' ? sgResp.body.slice(0, 200) : sgResp.body;
     }
 
-    result.sendgrid.status = resp.status;
-    // Avoid returning huge responses; truncate strings
-    if (typeof body === 'string') result.sendgrid.body = body.slice(0, 200);
-    else result.sendgrid.body = body;
+    result.sendgrid.status = sgResp.statusCode;
+    result.sendgrid.body = body;
 
     return res.json(result);
   } catch (err) {
