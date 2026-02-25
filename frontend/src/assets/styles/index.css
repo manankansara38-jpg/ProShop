@@ -529,7 +529,7 @@ select:focus {
   font-size: 1.05rem;
   color: #666;
   line-height: 1.6;
-  margin-bottom: 0;
+  margin-bottom: 2rem;
   font-style: italic;
 }
 
@@ -703,9 +703,9 @@ select:focus {
 
 /* Review Section */
 .review-section {
-  margin-top: 60px;
+  margin-top: 80px;
   padding-top: 40px;
-  border-top: 2px solid #e0e0e0;
+  border-top: 3px solid #f0f0f0;
 }
 
 .reviews-title {
@@ -1683,5 +1683,569 @@ select:focus {
 
   .order-summary-card .list-group-item {
     padding: 1rem !important;
+  }
+}
+
+/* MOBILE OPTIMIZATION - Extra Small Devices (< 480px) */
+@media (max-width: 480px) {
+  /* General */
+  main {
+    padding: 0;
+  }
+  
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  /* Header adjustments */
+  .navbar {
+    padding: 0.5rem 0;
+  }
+  
+  .navbar-brand {
+    font-size: 1rem;
+  }
+  
+  /* Product Card */
+  .product-card {
+    min-height: 380px;
+    border-radius: 8px;
+  }
+  
+  .product-card img {
+    height: 180px;
+    padding: 8px;
+  }
+  
+  .product-card:hover {
+    transform: none;
+  }
+  
+  /* Font sizes */
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  h2 {
+    font-size: 1.25rem !important;
+  }
+  
+  h3 {
+    font-size: 1rem !important;
+  }
+  
+  .section-title {
+    font-size: 1.1rem !important;
+  }
+  
+  /* Buttons */
+  .btn {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
+  .btn-lg {
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+  }
+  
+  /* Forms */
+  .form-control,
+  .form-select {
+    font-size: 16px;
+    padding: 0.5rem;
+  }
+  
+  /* Tables */
+  table {
+    font-size: 0.8rem;
+  }
+  
+  table td,
+  table th {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  /* Rating */
+  .rating svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .rating-text {
+    font-size: 0.7rem;
+  }
+  
+  /* Review section */
+  .review h2 {
+    font-size: 1rem;
+    padding: 8px;
+  }
+  
+  /* Product images in tables */
+  .product-image-small {
+    max-width: 40px;
+    max-height: 40px;
+  }
+  
+  /* Spacing */
+  .mb-4 {
+    margin-bottom: 1rem !important;
+  }
+  
+  .mb-5 {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .my-5 {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Extra spacing for review section on mobile */
+  .review-section {
+    margin-top: 3rem !important;
+    padding-top: 2rem !important;
+  }
+  
+  /* Carousel */
+  .carousel-caption h1 {
+    font-size: 1.2rem;
+  }
+  
+  .carousel-caption p {
+    font-size: 0.8rem;
+  }
+  
+  .carousel-caption .btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Login/Register forms */
+  .form-container {
+    padding: 0.75rem;
+  }
+  
+  .form-container h1 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Product details page */
+  .product-details-col {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Cart page */
+  .cart-item {
+    padding: 0.75rem;
+  }
+  
+  /* Checkout steps */
+  .checkout-step {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* ===========================
+   TABLET VIEW (768px+)
+   ============================ */
+@media (min-width: 768px) {
+  .product-description {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+    text-overflow: clip;
+    max-height: none;
+  }
+}
+
+/* ============================ 
+   AMAZON-LIKE PRODUCT SCREEN STYLING
+   ============================== */
+
+/* Product Image Container - Like Amazon */
+.product-image-container {
+  background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.product-image-container:hover {
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.12);
+  border-color: #ff6b35;
+}
+
+.product-image-container img {
+  max-height: 500px;
+  object-fit: contain;
+  width: 100%;
+}
+
+/* Product Info Section */
+.product-info-section {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+}
+
+.product-detail-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #212121;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+.product-description {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 3rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+/* Product Rating Section */
+.product-rating-section {
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Discount Badge - Like Amazon */
+.discount-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c53 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  z-index: 10;
+}
+
+/* Related Products Section */
+.related-products-section {
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.03) 0%, rgba(255, 107, 53, 0.01) 100%);
+  border-top: 2px solid #f0f0f0;
+  border-bottom: 2px solid #f0f0f0;
+  padding: 3rem 0;
+  border-radius: 12px;
+}
+
+/* Mobile Product Screen Adjustments */
+@media (max-width: 768px) {
+  .product-image-container {
+    padding: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .product-image-container img {
+    max-height: 350px;
+  }
+
+  .product-detail-name {
+    font-size: 1.3rem;
+  }
+
+  .price-value {
+    font-size: 1.8rem;
+  }
+
+  .product-purchase-card {
+    border: 1px solid #e8e8e8 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  }
+}
+
+/* ============================ 
+   MOBILE OPTIMIZED COMPACT VIEW
+   ============================== */
+@media (max-width: 640px) {
+  /* Compact container padding */
+  .container, .container-fluid {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  /* Reduce row gaps */
+  .row {
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+  }
+
+  .row > * {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  /* Product grid - 2 columns on mobile */
+  .col-12, .col-sm-6, .col-md-4, .col-lg-3 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+
+  /* Overall spacing reduction */
+  main {
+    padding: 0;
+  }
+
+  .py-5 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .mb-4 {
+    margin-bottom: 0.75rem !important;
+  }
+
+  .mb-5, .my-5 {
+    margin-bottom: 1.5rem !important;
+    margin-top: 2rem !important;
+  }
+
+  .my-3 {
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Product card compact */
+  .product-card {
+    min-height: 340px !important;
+    border-radius: 6px;
+    padding: 0;
+  }
+
+  .product-card img {
+    height: 140px !important;
+    padding: 6px !important;
+  }
+
+  /* Product card body text compact */
+  .product-card .card-body {
+    padding: 0.75rem !important;
+  }
+
+  /* Rating text small */
+  .rating {
+    font-size: 0.8rem;
+  }
+
+  .rating svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .rating-text {
+    font-size: 0.65rem;
+    padding-left: 0.25rem;
+  }
+
+  /* Price text compact */
+  .price-value {
+    font-size: 0.95rem;
+  }
+
+  /* Button smaller */
+  .btn-sm, .btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  /* Section title smaller */
+  .section-title {
+    font-size: 1rem !important;
+    margin-bottom: 0.75rem !important;
+    padding-bottom: 8px !important;
+  }
+
+  h1 {
+    font-size: 1.2rem !important;
+  }
+
+  h2 {
+    font-size: 1rem !important;
+  }
+
+  /* Carousel smaller on mobile */
+  .carousel {
+    max-height: 300px;
+    overflow: visible;
+  }
+
+  .carousel-inner {
+    max-height: 300px;
+  }
+
+  .carousel-item {
+    max-height: 300px;
+    min-height: 300px;
+    position: relative;
+  }
+
+  .carousel-item img {
+    height: 300px;
+    object-fit: cover;
+  }
+
+  .carousel-caption {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+    margin: 0;
+  }
+
+  .carousel-caption h1 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: white;
+  }
+
+  .carousel-caption p {
+    font-size: 0.8rem;
+    margin: 0.3rem 0;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .carousel-caption .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    margin-top: 0.6rem;
+    display: inline-block;
+    visibility: visible;
+    z-index: 10;
+  }
+
+  /* Related products section compact */
+  .related-products-section {
+    padding: 1.5rem 0;
+    margin: 1.5rem 0 !important;
+  }
+
+  /* Product image container smaller on mobile */
+  .product-image-container {
+    padding: 8px;
+    margin-bottom: 0.75rem;
+  }
+
+  .product-image-container img {
+    max-height: 280px;
+  }
+
+  .product-detail-name {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .product-description {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 3rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 4.2rem;
+  }
+
+  /* Discount badge smaller */
+  .discount-badge {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    top: 8px;
+    right: 8px;
+  }
+
+  /* Mobile product screen */
+  .product-purchase-card {
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .product-purchase-card .card-body {
+    padding: 1rem !important;
+    gap: 0.75rem;
+  }
+
+  .price-label {
+    font-size: 0.8rem;
+  }
+
+  .price-value {
+    font-size: 1.5rem;
+  }
+
+  /* Forms */
+  .form-control, .form-select {
+    font-size: 14px;
+    padding: 0.4rem;
+  }
+
+  /* Tables */
+  table {
+    font-size: 0.75rem;
+  }
+
+  table td, table th {
+    padding: 0.4rem 0.2rem;
+  }
+
+  /* Cart and checkout */
+  .cart-item {
+    padding: 0.5rem;
+  }
+
+  /* Reviews section */
+  .review-item {
+    padding: 0.75rem !important;
+  }
+
+  .review-header {
+    margin-bottom: 0.35rem;
+  }
+
+  .review-name {
+    font-size: 0.85rem;
+  }
+
+  .review-date {
+    font-size: 0.7rem;
+  }
+
+  .review-comment {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  /* Navbar compact */
+  .navbar {
+    padding: 0.4rem 0;
+  }
+
+  .navbar-brand {
+    font-size: 0.9rem;
+  }
+
+  .nav-link {
+    padding: 0.4rem 0.5rem !important;
+    font-size: 0.85rem !important;
   }
 }

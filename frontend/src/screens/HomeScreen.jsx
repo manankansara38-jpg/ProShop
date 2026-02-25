@@ -1,4 +1,4 @@
-import { Container } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useGetLatestProductsQuery, useGetHotProductsQuery, useGetProductsByCategoryQuery, useGetProductsQuery } from '../slices/productsApiSlice';
 import { Link } from 'react-router-dom';
@@ -35,13 +35,13 @@ const HomeScreen = () => {
         {searchLoading ? (
           <Loader />
         ) : searchData && searchData.products && searchData.products.length > 0 ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', margin: '-0.75rem' }}>
+          <Row>
             {searchData.products.map((product) => (
-              <div key={product._id} style={{ flex: '0 0 calc(25% - 1.5rem)', maxWidth: 'calc(25% - 1.5rem)', padding: '0.75rem' }}>
+              <Col key={product._id} xs={12} sm={6} md={4} lg={3} className='mb-4'>
                 <Product product={product} />
-              </div>
+              </Col>
             ))}
-          </div>
+          </Row>
         ) : (
           <Message>No products found matching "{keyword}"</Message>
         )}
@@ -60,13 +60,13 @@ const HomeScreen = () => {
         {categoryLoading ? (
           <Loader />
         ) : categoryData && categoryData.length > 0 ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', margin: '-0.75rem' }}>
+          <Row>
             {categoryData.map((product) => (
-              <div key={product._id} style={{ flex: '0 0 calc(25% - 1.5rem)', maxWidth: 'calc(25% - 1.5rem)', padding: '0.75rem' }}>
+              <Col key={product._id} xs={12} sm={6} md={4} lg={3} className='mb-4'>
                 <Product product={product} />
-              </div>
+              </Col>
             ))}
-          </div>
+          </Row>
         ) : (
           <Message>No products found in this category</Message>
         )}
@@ -86,15 +86,15 @@ const HomeScreen = () => {
           {latestLoading ? (
             <Loader />
           ) : latestData && latestData.length > 0 ? (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', margin: '-0.75rem' }}>
+            <Row>
               {latestData.map((product) => (
-                <div key={product._id} style={{ flex: '0 0 calc(25% - 1.5rem)', maxWidth: 'calc(25% - 1.5rem)', padding: '0.75rem' }}>
+                <Col key={product._id} xs={12} sm={6} md={4} lg={3} className='mb-4'>
                   <div className='product-card h-100'>
                     <Product product={product} />
                   </div>
-                </div>
+                </Col>
               ))}
-            </div>
+            </Row>
           ) : null}
         </div>
 
@@ -112,15 +112,15 @@ const HomeScreen = () => {
           {hotLoading ? (
             <Loader />
           ) : hotData && hotData.length > 0 ? (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', margin: '-0.75rem' }}>
+            <Row>
               {hotData.map((product) => (
-                <div key={product._id} style={{ flex: '0 0 calc(25% - 1.5rem)', maxWidth: 'calc(25% - 1.5rem)', padding: '0.75rem' }}>
+                <Col key={product._id} xs={12} sm={6} md={4} lg={3} className='mb-4'>
                   <div className='product-card h-100'>
                     <Product product={product} />
                   </div>
-                </div>
+                </Col>
               ))}
-            </div>
+            </Row>
           ) : (
             <Message>No hot products available</Message>
           )}

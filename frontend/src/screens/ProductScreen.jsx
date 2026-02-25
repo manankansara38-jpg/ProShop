@@ -10,12 +10,15 @@ import {
   Card,
   Button,
   Form,
+  Container,
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import {
   useGetProductDetailsQuery,
   useCreateReviewMutation,
+  useGetProductsByCategoryQuery,
 } from '../slices/productsApiSlice';
+import Product from '../components/Product';
 import Rating from '../components/Rating';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
@@ -43,6 +46,14 @@ const ProductScreen = () => {
     refetch,
     error,
   } = useGetProductDetailsQuery(productId);
+
+  // Smart: Fetch related products by category and subcategory (if available)
+  // For Clothes: show same subcategory (men/women/kids)
+  // For other categories: show all products in that category
+  const { data: categoryProducts } = useGetProductsByCategoryQuery(
+    { category: product?.category, subcategory: product?.subcategory },
+    { skip: !product?.category }
+  );
 
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -198,83 +209,106 @@ const ProductScreen = () => {
               </Card>
             </Col>
           </Row>
-
-          {/* Reviews Section - Centered Below */}
-          <Row className='review-section'>
-            <Col lg={8} className='mx-auto'>
-              <h2 className='reviews-title'>📝 Reviews</h2>
-              
-              {product.reviews.length === 0 ? (
-                <Message>No Reviews Yet</Message>
-              ) : (
-                <ListGroup variant='flush' className='reviews-list'>
-                  {product.reviews.map((review) => (
-                    <ListGroup.Item key={review._id} className='review-item'>
-                      <div className='review-header'>
-                        <strong className='review-name'>{review.name}</strong>
-                        <span className='review-date'>{review.createdAt.substring(0, 10)}</span>
-                      </div>
-                      <Rating value={review.rating} />
-                      <p className='review-comment'>{review.comment}</p>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              )}
-
-              {/* Write Review Section */}
-              <div className='write-review-section mt-5'>
-                <h3 className='write-review-title'>✍ Write a Review</h3>
-
-                {loadingProductReview && <Loader />}
-
-                {userInfo ? (
-                  <Form onSubmit={submitHandler} className='review-form'>
-                    <Form.Group className='my-3' controlId='rating'>
-                      <Form.Label>Rating</Form.Label>
-                      <Form.Control
-                        as='select'
-                        required
-                        value={rating}
-                        onChange={(e) => setRating(e.target.value)}
-                        className='form-control-styled'
-                      >
-                        <option value=''>Select...</option>
-                        <option value='1'>1 - Poor</option>
-                        <option value='2'>2 - Fair</option>
-                        <option value='3'>3 - Good</option>
-                        <option value='4'>4 - Very Good</option>
-                        <option value='5'>5 - Excellent</option>
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group className='my-3' controlId='comment'>
-                      <Form.Label>Comment</Form.Label>
-                      <Form.Control
-                        as='textarea'
-                        rows='4'
-                        required
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        className='form-control-styled'
-                        placeholder='Write your review here...'
-                      ></Form.Control>
-                    </Form.Group>
-                    <Button
-                      disabled={loadingProductReview}
-                      type='submit'
-                      className='submit-review-btn'
-                    >
-                      Submit Review
-                    </Button>
-                  </Form>
-                ) : (
-                  <Message>
-                    Please <Link to='/login' className='link-primary'>sign in</Link> to write a review
-                  </Message>
-                )}
-              </div>
-            </Col>
-          </Row>
         </>
+      )}
+
+      {/* Reviews Section - Centered Below */}
+      {product && (
+        <Row className='review-section my-5'>
+          <Col lg={8} className='mx-auto'>
+            <h2 className='reviews-title'>📝 Reviews</h2>
+            
+            {product.reviews.length === 0 ? (
+              <Message>No Reviews Yet</Message>
+            ) : (
+              <ListGroup variant='flush' className='reviews-list'>
+                {product.reviews.map((review) => (
+                  <ListGroup.Item key={review._id} className='review-item'>
+                    <div className='review-header'>
+                      <strong className='review-name'>{review.name}</strong>
+                      <span className='review-date'>{review.createdAt.substring(0, 10)}</span>
+                    </div>
+                    <Rating value={review.rating} />
+                    <p className='review-comment'>{review.comment}</p>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            )}
+
+            {/* Write Review Section */}
+            <div className='write-review-section mt-5'>
+              <h3 className='write-review-title'>✍ Write a Review</h3>
+
+              {loadingProductReview && <Loader />}
+
+              {userInfo ? (
+                <Form onSubmit={submitHandler} className='review-form'>
+                  <Form.Group className='my-3' controlId='rating'>
+                    <Form.Label>Rating</Form.Label>
+                    <Form.Control
+                      as='select'
+                      required
+                      value={rating}
+                      onChange={(e) => setRating(e.target.value)}
+                      className='form-control-styled'
+                    >
+                      <option value=''>Select...</option>
+                      <option value='1'>1 - Poor</option>
+                      <option value='2'>2 - Fair</option>
+                      <option value='3'>3 - Good</option>
+                      <option value='4'>4 - Very Good</option>
+                      <option value='5'>5 - Excellent</option>
+                    </Form.Control>
+                  </Form.Group>
+                  <Form.Group className='my-3' controlId='comment'>
+                    <Form.Label>Comment</Form.Label>
+                    <Form.Control
+                      as='textarea'
+                      rows='4'
+                      required
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      className='form-control-styled'
+                      placeholder='Write your review here...'
+                    ></Form.Control>
+                  </Form.Group>
+                  <Button
+                    disabled={loadingProductReview}
+                    type='submit'
+                    className='submit-review-btn'
+                  >
+                    Submit Review
+                  </Button>
+                </Form>
+              ) : (
+                <Message>
+                  Please <Link to='/login' className='link-primary'>sign in</Link> to write a review
+                </Message>
+              )}
+            </div>
+          </Col>
+        </Row>
+      )}
+
+      {/* Related Products Section - Like Amazon */}
+      {categoryProducts && categoryProducts.length > 1 && (
+        <div className='related-products-section my-5'>
+          <Container>
+            <h2 className='section-title mb-4' style={{ paddingBottom: '15px' }}>
+              🛍️ Similar Products You Might Like
+            </h2>
+            <Row>
+              {categoryProducts
+                .filter((p) => p._id !== productId) // Exclude current product
+                .slice(0, 4) // Show only 4 related products
+                .map((relatedProduct) => (
+                  <Col key={relatedProduct._id} xs={12} sm={6} md={4} lg={3} className='mb-4'>
+                    <Product product={relatedProduct} />
+                  </Col>
+                ))}
+            </Row>
+          </Container>
+        </div>
       )}
     </>
   );
