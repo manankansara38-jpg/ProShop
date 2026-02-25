@@ -65,8 +65,11 @@ const OrderScreen = () => {
               orderId: response.razorpay_order_id,
             });
             
+            // Show processing message
+            toast.info('Processing payment confirmation...', { autoClose: false });
+            
             // Send payment details to backend
-            await payOrder({
+            const result = await payOrder({
               orderId,
               details: {
                 razorpayPaymentId: response.razorpay_payment_id,
@@ -74,11 +77,18 @@ const OrderScreen = () => {
               },
             }).unwrap();
             
-            refetch();
-            toast.success('Order is paid successfully!');
+            console.log('✅ Payment confirmed. Order details:', result);
+            
+            // Refresh order details
+            await refetch();
+            
+            // Dismiss processing toast and show success
+            toast.dismiss();
+            toast.success('🎉 Order is paid successfully! Confirmation email will be sent shortly.', { autoClose: 5000 });
           } catch (err) {
-            console.error('Payment error:', err);
-            toast.error('Payment verification failed. Please try again.');
+            console.error('❌ Payment verification error:', err);
+            toast.dismiss();
+            toast.error(err?.data?.message || 'Payment verification failed. Please try again.');
           }
         },
         prefill: {
