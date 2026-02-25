@@ -6,8 +6,11 @@ const sendEmail = async ({ to, subject, html }) => {
   console.log('📧 ================================');
   console.log('📧 To:', to);
   console.log('📧 Subject:', subject);
-  console.log('📧 DEBUG: SENDGRID_API_KEY set?', !!process.env.SENDGRID_API_KEY);
-  console.log('📧 DEBUG: SENDGRID_API_KEY first 10 chars:', process.env.SENDGRID_API_KEY ? process.env.SENDGRID_API_KEY.substring(0, 10) : 'NOT SET');
+  console.log('📧 DEBUG: NODE_ENV=', process.env.NODE_ENV || 'not set');
+  console.log('📧 DEBUG: SENDGRID_API_KEY present?', !!process.env.SENDGRID_API_KEY);
+  // Do not print full API key; show prefix to help detect truncation
+  console.log('📧 DEBUG: SENDGRID_API_KEY prefix:', process.env.SENDGRID_API_KEY ? process.env.SENDGRID_API_KEY.slice(0, 8) : 'NOT SET');
+  console.log('📧 DEBUG: SENDGRID_FROM_EMAIL=', process.env.SENDGRID_FROM_EMAIL || 'NOT SET');
 
   // PRIORITY 1: If SendGrid API key is provided, use the Web API (works around blocked SMTP)
   if (process.env.SENDGRID_API_KEY) {
