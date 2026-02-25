@@ -11,6 +11,7 @@ import cartRoutes from './routes/cartRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import oauthRoutes from './routes/oauthRoutes.js';
+import debugRoutes from './routes/debugRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import mongoose from 'mongoose';
 
@@ -58,6 +59,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/oauth', oauthRoutes);
+app.use('/api/debug', debugRoutes);
 
 // Razorpay config endpoint
 app.get('/api/config/razorpay', (req, res) =>
