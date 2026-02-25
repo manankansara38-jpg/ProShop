@@ -23,8 +23,9 @@ const app = express();
 
 // CORS and Security Headers Middleware
 app.use((req, res, next) => {
-  // Allow requests from any origin (adjust for production if needed)
-  res.header('Access-Control-Allow-Origin', '*');
+  // Allow requests from the request origin (needed when using credentials)
+  const requestOrigin = req.headers.origin || '*';
+  res.header('Access-Control-Allow-Origin', requestOrigin);
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-rtb-fingerprint-id');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -32,6 +33,8 @@ app.use((req, res, next) => {
   // Permissions Policy - disallow unnecessary features
   // Using modern Permissions-Policy syntax
   res.header('Permissions-Policy', 'accelerometer=(), camera=(), microphone=(), geolocation=(), gyroscope=(), magnetometer=(), payment=(self "https://checkout.razorpay.com"), usb=()');
+  // Allow popups (Razorpay checkout opens a popup) to communicate back to opener
+  res.header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   
   // Expose headers that third parties might need
   res.header('Access-Control-Expose-Headers', 'Content-Type, x-rtb-fingerprint-id');
