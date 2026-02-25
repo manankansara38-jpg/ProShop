@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
+import { FaSearch } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,10 +28,10 @@ const SearchBox = () => {
         name='q'
         onChange={(e) => setKeyword(e.target.value)}
         value={keyword}
-        placeholder='Search Products...'
+        placeholder='Search...'
       ></Form.Control>
-      <Button type='submit' variant='primary'>
-        Search
+      <Button type='submit' variant='primary' className='search-btn'>
+        <FaSearch />
       </Button>
     </Form>
   );
