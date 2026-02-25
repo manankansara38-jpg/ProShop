@@ -14,9 +14,10 @@ const sendEmail = async ({ to, subject, html }) => {
 
   // PRIORITY 1: If Mailgun credentials are provided, use Mailgun Web API
   if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
+    let startTime;
     try {
       console.log('📧 ✓ Mailgun vars detected. Attempting Mailgun Web API...');
-      const startTime = Date.now();
+      startTime = Date.now();
       
       // Dynamic import to prevent load errors if package is missing
       const FormData = (await import('form-data')).default;
@@ -50,7 +51,7 @@ const sendEmail = async ({ to, subject, html }) => {
       console.log('📧 ================================\n');
       return { sent: true, via: 'mailgun', messageId: result.id };
     } catch (mgErr) {
-      const elapsed = Date.now() - startTime;
+      const elapsed = startTime ? Date.now() - startTime : 0;
       console.error('\n❌ ================================');
       console.error('❌ MAILGUN WEB API FAILED');
       console.error('❌ ================================');
